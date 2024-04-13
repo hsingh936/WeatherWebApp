@@ -7,6 +7,7 @@ const City = () => {
     const [cities, setCities] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredCities, setFilteredCities] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,7 +52,19 @@ const City = () => {
     }, [cities]);
 
     const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
+        const searchTerm = event.target.value.toLowerCase();
+        setSearchTerm(searchTerm);
+
+        if (searchTerm === '') {
+            setSuggestions([]);
+            setFilteredCities(cities); 
+        } else {
+            const filtered = cities.filter(city =>
+                city.name.toLowerCase().includes(searchTerm)
+            );
+            setFilteredCities(filtered);
+            setSuggestions(filtered.map(city => city.name));
+        }
     };
 
     return (
@@ -64,6 +77,15 @@ const City = () => {
                 onChange={handleSearchChange}
                 className={styles.searchBar}
             />
+
+            {suggestions.length > 0 && (
+                <ul className={styles.suggestions}>
+                    {suggestions.map((suggestion, index) => (
+                        <li key={index}>{suggestion}</li>
+                    ))}
+                </ul>
+            )}
+
             <table className={styles.table}>
                 <thead>
                     <tr>
